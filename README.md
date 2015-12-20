@@ -17,13 +17,13 @@ make osx
 ```
 
 ### Dingoo (running Dingux)
-Ensure that you've installed the Dinguz toolchain, found here: [Dingux toolchain](http://wiki.dingoonity.org/index.php?title=Development:Tutorials:HelloWorld) then:
+Ensure that you've installed the [Dingux toolchain](http://wiki.dingoonity.org/index.php?title=Development:Tutorials:HelloWorld) then:
 ```shell
 make dingoo
 ```
 
 ## Tests
-The project uses the excellent Bandit unit testing framework available at [banditcpp]{http://banditcpp.org} under the MIT license.
+The project uses the excellent Bandit unit testing framework available at [banditcpp](http://banditcpp.org) under the MIT license.
 
 To compile the tests for OSX do:
 
