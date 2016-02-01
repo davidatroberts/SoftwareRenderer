@@ -1,6 +1,7 @@
 #ifndef LIGHTING_H
 #define LIGHTING_H
 
+#include <memory>
 #include "SDL/SDL.h"
 #include "Vector.hpp"
 
@@ -9,19 +10,7 @@ namespace model {
 }
 
 namespace lighting {
-	struct Light {
-		Vector view_position;
-		Vector ambient;
-		Vector diffuse;
-		Vector specular;
-		struct {
-			float constant;
-			float linear;
-			float exponent;
-		} attenuation;
-	};
-	typedef struct Light Light;
-
+	// struct for storing face attributes
 	struct Surface {
 		Vector ambient;
 		Vector diffuse;
@@ -30,6 +19,7 @@ namespace lighting {
 	};
 	typedef struct Surface Surface;
 
+	// struct for storing light result after calculations
 	struct LightResult {
 		Vector ambient;
 		Vector diffuse;
@@ -44,11 +34,44 @@ namespace lighting {
 	};
 	typedef struct LightResult LightResult;
 
+	// util struct for attenuation
+	struct Attenuation {
+		float constant;
+		float linear;
+		float exponent;
+	};
+	typedef struct Attenuation Attenuation;
+
+	// base class for Light
+	class Light {
+	public:
+		Light(Vector view_position, Vector ambient, Vector diffuse,
+			Vector specular);
+		virtual lighting::LightResult calculate_light(lighting::Surface &surface, 
+			Vector &position, Vector &normal) = 0;
+		virtual ~Light() = 0;
+
+		Vector view_position;
+		Vector ambient;
+		Vector diffuse;
+		Vector specular;
+	};
+
+	class PointLight: public Light {
+	public:
+		PointLight(Vector view_position, Vector ambient, Vector diffuse,
+			Vector specular, Attenuation attenuation);
+		lighting::LightResult calculate_light(lighting::Surface &surface,
+			Vector &position, Vector &normal);
+		~PointLight();
+
+		lighting::Attenuation attenuation;
+	};
+
 	float attenuate(float constant, float linear, float exponent, float d);
-	lighting::LightResult calculate_point_light(lighting::Light &light, 
-		lighting::Surface &surface, Vector &position, Vector &normal);
-	std::vector<lighting::LightResult> calculate_point_lights(
-		std::vector<lighting::Light> &lights, model::Model &model);
+	std::vector<lighting::LightResult> calculate_lights(
+		std::vector<std::shared_ptr<lighting::Light>> &lights, 
+		model::Model &model);
 	std::vector<SDL_Color> lightresults_to_colours(
 		std::vector<lighting::LightResult> &lightresults);
 }

@@ -1,8 +1,9 @@
+#include <iostream>
+#include <memory>
+#include <sstream>
 #include <stdio.h>
 #include <unistd.h>
-#include <iostream>
 #include <vector>
-#include <sstream>
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
 #include "SDL/SDL_ttf.h"
@@ -141,8 +142,8 @@ int main(int argc, char *argv[]) {
 		target, up);
 
 	// set the lighting
-	std::vector<lighting::Light> lights;
-	lighting::Light light = {
+	std::vector<std::shared_ptr<lighting::Light>> lights;
+	std::shared_ptr<lighting::Light> light(new lighting::PointLight(
 		Vector(0, 0, 0),		// position
 		Vector(1.0, 1.0, 1.0),	// ambient
 		Vector(1.0, 1.0, 1.0), 	// diffuse
@@ -152,7 +153,7 @@ int main(int argc, char *argv[]) {
 			0.1f,				// linear attenuation factor
 			0.1f				// exponent attenuation factor
 		}
-	};
+	));
 	lights.push_back(light);
 
 	// create the model
@@ -207,7 +208,7 @@ int main(int argc, char *argv[]) {
 		// update light position
 		rotate_light_y += (5.0f*dt);
 		Matrix<float> lrm = Matrix<float>::rotate_y(rotate_light_y);
-		lights[0].view_position = lrm.mult_vector(light_pos);
+		lights[0]->view_position = lrm.mult_vector(light_pos);
 
 		// model view matrix
 		Matrix <float> mv = model * view;
@@ -248,7 +249,7 @@ int main(int argc, char *argv[]) {
 
 			// calculate lighting
 			std::vector<lighting::LightResult> light_results = 
-				lighting::calculate_point_lights(lights, visible_model);
+				lighting::calculate_lights(lights, visible_model);
 
 			// transform lightresults to colour
 			std::vector<SDL_Color> light_colours = 
@@ -286,9 +287,9 @@ int main(int argc, char *argv[]) {
 
 		// display angle
 		std::stringstream info_str;
-		info_str << "light x:" << lights[0].view_position.x << 
-			" y: " << lights[0].view_position.y << " z: " 
-			<< lights[0].view_position.z << std::endl;
+		info_str << "light x:" << lights[0]->view_position.x << 
+			" y: " << lights[0]->view_position.y << " z: " 
+			<< lights[0]->view_position.z << std::endl;
 		text.render_string(0, 15, font, font_colour, info_str.str());
 
 		// unlock screen
