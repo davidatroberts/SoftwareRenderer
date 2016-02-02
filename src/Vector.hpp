@@ -35,6 +35,7 @@ public:
 	static Vector backward();
 	static Vector forward();
 
+	friend Vector operator-(const Vector &vec);
 	friend bool operator==(Vector &v1, Vector &v2);
 	friend bool operator!=(Vector &v1, Vector &v2);
 	friend std::ostream& operator<<(std::ostream &strm, Vector &v);

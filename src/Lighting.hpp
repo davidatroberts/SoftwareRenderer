@@ -68,6 +68,30 @@ namespace lighting {
 		lighting::Attenuation attenuation;
 	};
 
+	class DirectionalLight: public Light {
+	public:
+		DirectionalLight(Vector view_position, Vector ambient, Vector diffuse,
+			Vector specular);
+		lighting::LightResult calculate_light(lighting::Surface &surface,
+			Vector &position, Vector &normal);
+		~DirectionalLight();
+	};
+
+	class SpotLight: public Light {
+	public:
+		SpotLight(Vector view_position, Vector ambient, Vector diffuse,
+			Vector specular, Attenuation attenuation, Vector view_direction, 
+			float cutoff, float exponent);
+		lighting::LightResult calculate_light(lighting::Surface &surface,
+			Vector &position, Vector &normal);
+		~SpotLight();
+
+		lighting::Attenuation attenuation;
+		Vector view_direction;
+		float cutoff;
+		float exponent;
+	};
+
 	float attenuate(float constant, float linear, float exponent, float d);
 	std::vector<lighting::LightResult> calculate_lights(
 		std::vector<std::shared_ptr<lighting::Light>> &lights, 

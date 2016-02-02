@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "Lighting.hpp"
+#include "MathUtils.hpp"
 #include "Model.hpp"
 
 namespace lighting {
@@ -24,7 +25,7 @@ PointLight::PointLight(Vector view_position, Vector ambient, Vector diffuse,
 }
 
 lighting::LightResult PointLight::calculate_light(lighting::Surface &surface,
-			Vector &position, Vector &normal) {
+	Vector &position, Vector &normal) {
 	// define lighting result
 	lighting::LightResult result = {
 		Vector(0.0, 0.0, 0.0),
@@ -62,6 +63,109 @@ lighting::LightResult PointLight::calculate_light(lighting::Surface &surface,
 }
 
 PointLight::~PointLight() {
+}
+
+// Directional Light Class
+DirectionalLight::DirectionalLight(Vector view_position, Vector ambient, 
+	Vector diffuse, Vector specular)
+:Light(view_position, ambient, diffuse, specular) {
+}
+
+lighting::LightResult DirectionalLight::calculate_light(lighting::Surface &surface,
+	Vector &position, Vector &normal) {
+	// define lighting result
+	lighting::LightResult result = {
+		Vector(0.0, 0.0, 0.0),
+		Vector(0.0, 0.0, 0.0),
+		Vector(0.0, 0.0, 0.0)
+	};
+
+	// direction to light
+	Vector light_direction = position - view_position;
+	light_direction = light_direction.normalized();
+
+	// accumulate ambient
+	result.ambient += surface.ambient * ambient;
+
+	// accumulate diffuse 
+	float n_dot_l = std::max(0.0f, normal.dot(light_direction));
+	result.diffuse += (surface.diffuse * diffuse) * n_dot_l;
+
+	if (n_dot_l > 0.0) {
+		// accumulate specular if fragment is illuminated
+		Vector view_direction = position.normalized();
+		Vector reflection = light_direction.reflect(normal);
+		float specular = std::max(0.0f, reflection.dot(view_direction));
+
+		result.specular += surface.specular * specular 
+			* pow(specular, surface.shininess);
+	}
+
+	return result;
+}
+
+DirectionalLight::~DirectionalLight() {
+}
+
+// Spot Light Class
+SpotLight::SpotLight(Vector view_position, Vector ambient, Vector diffuse,
+	Vector specular, Attenuation attenuation, Vector view_direction, 
+	float cutoff, float exponent) 
+:Light(view_position, ambient, diffuse, specular), attenuation(attenuation), 
+view_direction(view_direction), cutoff(cutoff), exponent(exponent){
+}
+
+lighting::LightResult SpotLight::calculate_light(lighting::Surface &surface,
+	Vector &position, Vector &normal) {
+	// define lighting result
+	lighting::LightResult result = {
+		Vector(0.0, 0.0, 0.0),
+		Vector(0.0, 0.0, 0.0),
+		Vector(0.0, 0.0, 0.0)
+	};
+
+	// direction to light
+	Vector light_direction = position - view_position;
+	
+	Vector neg_light_direction = -light_direction.normalized();
+
+	float spot_dot_l = view_direction.normalized().dot(
+		neg_light_direction);
+
+	// compute attenuation factor
+	float light_distance = light_direction.magnitude();
+	float atten = attenuate(attenuation.constant,
+		attenuation.linear, attenuation.exponent, light_distance);
+
+	light_direction = light_direction.normalized();
+
+	// accumulate ambient
+	result.ambient += surface.ambient * ambient * atten;
+
+	if (spot_dot_l > cutoff) {
+		// incorporate spot direction into attenuation
+		atten *= pow(spot_dot_l, exponent);
+
+		// accumulate diffuse
+		float n_dot_l = std::max(0.0f, normal.dot(light_direction));
+		result.diffuse += (surface.diffuse * diffuse * atten) * n_dot_l;
+
+		if (n_dot_l > 0.0) {
+			// accumulate specular if fragment is illuminated
+			Vector view_direction = position.normalized();
+			Vector reflection = light_direction.reflect(normal);
+			float specular = std::max(0.0f, reflection.dot(view_direction));
+
+			result.specular += surface.specular * specular 
+				* pow(specular, surface.shininess) * atten;
+		}
+	}
+
+	return result;
+}
+
+SpotLight::~SpotLight() {
+
 }
 
 float attenuate(float constant, float linear, float exponent, float d) {

@@ -149,6 +149,10 @@ Vector Vector::backward() {
 	return Vector(0, 0, -1);
 }
 
+Vector operator-(const Vector &vec) {
+	return Vector(-vec.x, -vec.y, -vec.z, -vec.w);
+}
+
 bool operator==(Vector &v1, Vector &v2) {
 	return (
 		v1.x == v2.x &&
