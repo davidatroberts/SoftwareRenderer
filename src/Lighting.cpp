@@ -15,6 +15,11 @@ Light::Light(Vector view_position, Vector ambient, Vector diffuse,
 specular(specular) {
 }
 
+Light::Light(const Light& other)
+:view_position(other.view_position), ambient(other.ambient), 
+diffuse(other.diffuse), specular(other.specular) {
+}
+
 Light::~Light() {
 }
 
@@ -22,6 +27,11 @@ Light::~Light() {
 PointLight::PointLight(Vector view_position, Vector ambient, Vector diffuse,
 	Vector specular, Attenuation attenuation)
 :Light(view_position, ambient, diffuse, specular), attenuation(attenuation) {
+}
+
+PointLight::PointLight(const PointLight& other)
+:Light(other), attenuation(other.attenuation) {
+
 }
 
 lighting::LightResult PointLight::calculate_light(lighting::Surface &surface,
@@ -71,6 +81,11 @@ DirectionalLight::DirectionalLight(Vector view_position, Vector ambient,
 :Light(view_position, ambient, diffuse, specular) {
 }
 
+DirectionalLight::DirectionalLight(const DirectionalLight& other)
+:Light(other) {
+
+}
+
 lighting::LightResult DirectionalLight::calculate_light(lighting::Surface &surface,
 	Vector &position, Vector &normal) {
 	// define lighting result
@@ -113,6 +128,13 @@ SpotLight::SpotLight(Vector view_position, Vector ambient, Vector diffuse,
 	float cutoff, float exponent) 
 :Light(view_position, ambient, diffuse, specular), attenuation(attenuation), 
 view_direction(view_direction), cutoff(cutoff), exponent(exponent){
+}
+
+SpotLight::SpotLight(const SpotLight& other)
+:Light(other), attenuation(other.attenuation), 
+view_direction(other.view_direction), cutoff(other.cutoff), 
+exponent(other.exponent) {
+	
 }
 
 lighting::LightResult SpotLight::calculate_light(lighting::Surface &surface,

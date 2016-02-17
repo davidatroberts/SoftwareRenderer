@@ -7,9 +7,11 @@
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
 #include "SDL/SDL_ttf.h"
+#include "selene.h"
 #include "Debug.hpp"
 #include "Graphics.hpp"
 #include "Lighting.hpp"
+#include "LuaUtils.hpp"
 #include "Matrix.hpp"
 #include "Model.hpp" 
 #include "Pipeline.hpp"
@@ -87,6 +89,34 @@ void handle_event(const SDL_Event &event) {
 }
 
 int main(int argc, char *argv[]) {
+	// check for all arguments
+	if (argc < 2) {
+		std::cerr << "No scene file given" << std::endl;
+		return 1;
+	}
+
+	// load the scene file
+	sel::State scene;
+	lu::initialise(scene);
+	lu::initialise_model(scene);
+	if (!scene.Load(std::string(argv[1]))) {
+		std::cerr << "Error loading scene file" << std::endl;
+		return 1;
+	}
+
+	// add the lights to the scene
+	std::vector<std::shared_ptr<lighting::Light>> lights;
+	lu::read_obj_array<lighting::PointLight, lighting::Light>(scene, lights, 
+		"point_lights");
+	lu::read_obj_array<lighting::DirectionalLight, lighting::Light>(scene, lights, 
+		"directional_lights");
+	lu::read_obj_array<lighting::SpotLight, lighting::Light>(scene, lights, 
+		"spot_lights");
+
+	// load the models
+	std::vector<std::shared_ptr<model::Model>> models;
+	lu::read_obj_array<model::Model, model::Model>(scene, models, "models");
+	
 	// init SDL
 	if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) == -1) {
 		std::cerr << "Failed initialize SDL" << std::endl;
@@ -141,25 +171,11 @@ int main(int argc, char *argv[]) {
 	Matrix<float> view = Matrix<float>::lookat(camera_pos, 
 		target, up);
 
-	// set the lighting
-	std::vector<std::shared_ptr<lighting::Light>> lights;
-	std::shared_ptr<lighting::Light> light(new lighting::PointLight(
-		Vector(0, 0, 0),		// position
-		Vector(1.0, 1.0, 1.0),	// ambient
-		Vector(1.0, 1.0, 1.0), 	// diffuse
-		Vector(1.0, 1.0, 1.0),	// specular
-		{
-			1,					// constant attenuation factor
-			0.1f,				// linear attenuation factor
-			0.1f				// exponent attenuation factor
-		}
-	));
-	lights.push_back(light);
-
 	// create the model
 	// model::Model mesh = model::cube();
 	// model::Model mesh = model::octahedron();
-	model::Model mesh = model::sphere(3);
+	// model::Model mesh = model::sphere(3);
+	model::Model mesh = *models[0].get();
 	mesh.surface_attribute =  {
 		Vector(0.0, 0.0, 1.0),	// ambient
 		Vector(0.0, 0.0, 1.0), 	// diffuse

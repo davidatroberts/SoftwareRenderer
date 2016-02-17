@@ -36,6 +36,10 @@ namespace lighting {
 
 	// util struct for attenuation
 	struct Attenuation {
+		Attenuation(float constant, float linear, float exponent)
+		:constant(constant), linear(linear), exponent(exponent) {
+		}
+
 		float constant;
 		float linear;
 		float exponent;
@@ -47,6 +51,7 @@ namespace lighting {
 	public:
 		Light(Vector view_position, Vector ambient, Vector diffuse,
 			Vector specular);
+		Light(const Light& other);
 		virtual lighting::LightResult calculate_light(lighting::Surface &surface, 
 			Vector &position, Vector &normal) = 0;
 		virtual ~Light() = 0;
@@ -61,6 +66,7 @@ namespace lighting {
 	public:
 		PointLight(Vector view_position, Vector ambient, Vector diffuse,
 			Vector specular, Attenuation attenuation);
+		PointLight(const PointLight& other);
 		lighting::LightResult calculate_light(lighting::Surface &surface,
 			Vector &position, Vector &normal);
 		~PointLight();
@@ -72,6 +78,7 @@ namespace lighting {
 	public:
 		DirectionalLight(Vector view_position, Vector ambient, Vector diffuse,
 			Vector specular);
+		DirectionalLight(const DirectionalLight& other);
 		lighting::LightResult calculate_light(lighting::Surface &surface,
 			Vector &position, Vector &normal);
 		~DirectionalLight();
@@ -82,6 +89,7 @@ namespace lighting {
 		SpotLight(Vector view_position, Vector ambient, Vector diffuse,
 			Vector specular, Attenuation attenuation, Vector view_direction, 
 			float cutoff, float exponent);
+		SpotLight(const SpotLight& other);
 		lighting::LightResult calculate_light(lighting::Surface &surface,
 			Vector &position, Vector &normal);
 		~SpotLight();
