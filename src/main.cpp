@@ -13,47 +13,36 @@
 #include "Lighting.hpp"
 #include "LuaUtils.hpp"
 #include "Matrix.hpp"
-#include "Model.hpp" 
+#include "Model.hpp"
 #include "Pipeline.hpp"
 #include "Text.hpp"
 #include "Timer.hpp"
 #include "Vector.hpp"
 
-#define SCREEN_WIDTH 	320 
-#define SCREEN_HEIGHT 	240
-#define SCREEN_BPP 		16
-
-#define UP_BTN 				SDLK_UP
-#define DOWN_BTN 			SDLK_DOWN
-#define LEFT_BTN 			SDLK_LEFT
-#define RIGHT_BTN 			SDLK_RIGHT
-#define A_BTN 				SDLK_LCTRL
-#define B_BTN 				SDLK_LALT
-#define X_BTN 				SDLK_SPACE
-#define Y_BTN 				SDLK_LSHIFT
+#define UP_BTN 							SDLK_UP
+#define DOWN_BTN 						SDLK_DOWN
+#define LEFT_BTN 						SDLK_LEFT
+#define RIGHT_BTN 					SDLK_RIGHT
+#define A_BTN 							SDLK_LCTRL
+#define B_BTN 							SDLK_LALT
+#define X_BTN 							SDLK_SPACE
+#define Y_BTN 							SDLK_LSHIFT
 #define LEFT_SHOULDER_BTN 	SDLK_TAB
 #define RIGHT_SHOULDER_BTN 	SDLK_BACKSPACE
-#define SELECT_BTN 			SDLK_ESCAPE
-#define START_BTN 			SDLK_RETURN
+#define SELECT_BTN 					SDLK_ESCAPE
+#define START_BTN 					SDLK_RETURN
 
 bool quit = false;
-
-// view settings
-Vector camera_pos(0.0f, 0.0f, 10.0f);
-Vector target(0.0f, 0.0f, 0.0f);
-Vector up(0.0f, 1.0f, 0.0f);
 
 float rotate_y = 90.0f;
 float rotate_x = 0.0f;
 float rotate_light_y = 0.0;
 
-Vector light_pos(2.4, 0, 0);
-
 // calculating FPS
 int frame_count = 0;
 float fps = 0;
-Timer fps_timer;	
-Timer caption_update_timer;	
+Timer fps_timer;
+Timer caption_update_timer;
 
 void handle_event(const SDL_Event &event) {
 	if (event.type == SDL_KEYDOWN) {
@@ -65,22 +54,16 @@ void handle_event(const SDL_Event &event) {
 				quit = true;
 				break;
 			case RIGHT_BTN:
-				light_pos.x +=0.2;
 				break;
 			case LEFT_BTN:
-				light_pos.x -=0.2;
 				break;
 			case UP_BTN:
-				light_pos.y +=0.2;
 				break;
 			case DOWN_BTN:
-				light_pos.y -=0.2;
 				break;
 			case A_BTN:
-				light_pos.z +=0.2;
 				break;
 			case B_BTN:
-				light_pos.z -=0.2;
 				break;
 			default:
 				break;
@@ -104,19 +87,29 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
+	// screen settings
+	const int SCREEN_WIDTH = scene["display"]["width"];
+	const int SCREEN_HEIGHT = scene["display"]["height"];
+	const int SCREEN_BPP = scene["display"]["bpp"];
+
+	// camera settings
+	Vector camera_pos = lu::read_raw_obj<Vector>(scene["camera"]["position"]);
+	Vector target = lu::read_raw_obj<Vector>(scene["camera"]["target"]);
+	Vector up = lu::read_raw_obj<Vector>(scene["camera"]["up"]);
+
 	// add the lights to the scene
 	std::vector<std::shared_ptr<lighting::Light>> lights;
-	lu::read_obj_array<lighting::PointLight, lighting::Light>(scene, lights, 
+	lu::read_obj_array<lighting::PointLight, lighting::Light>(scene, lights,
 		"point_lights");
-	lu::read_obj_array<lighting::DirectionalLight, lighting::Light>(scene, lights, 
+	lu::read_obj_array<lighting::DirectionalLight, lighting::Light>(scene, lights,
 		"directional_lights");
-	lu::read_obj_array<lighting::SpotLight, lighting::Light>(scene, lights, 
+	lu::read_obj_array<lighting::SpotLight, lighting::Light>(scene, lights,
 		"spot_lights");
 
 	// load the models
 	std::vector<std::shared_ptr<model::Model>> models;
 	lu::read_obj_array<model::Model, model::Model>(scene, models, "models");
-	
+
 	// init SDL
 	if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) == -1) {
 		std::cerr << "Failed initialize SDL" << std::endl;
@@ -124,7 +117,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	// setup the screen
-	SDL_Surface* screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 
+	SDL_Surface* screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT,
 		SCREEN_BPP, SDL_SWSURFACE);
 	if (!screen) {
 		std::cerr << "Failed to initialize SDL video mode" << std::endl;
@@ -147,7 +140,7 @@ int main(int argc, char *argv[]) {
 	// hide the cursor
 	SDL_ShowCursor(SDL_DISABLE);
 
-	// update the screen
+	// update the screens
 	if (SDL_Flip(screen) == -1) {
 		std::cerr << "Failed to flip the screen" << std::endl;
 		return 1;
@@ -168,7 +161,7 @@ int main(int argc, char *argv[]) {
 		0.01f, 1.0f);
 
 	// camera transform
-	Matrix<float> view = Matrix<float>::lookat(camera_pos, 
+	Matrix<float> view = Matrix<float>::lookat(camera_pos,
 		target, up);
 
 	// create the model
@@ -218,13 +211,14 @@ int main(int argc, char *argv[]) {
 			mesh_position.x, mesh_position.y, mesh_position.z);
 		// rotate_y += (20.0f*dt);
 		Matrix<float> rmy = Matrix<float>::rotate_y(rotate_y);
-		Matrix<float> rmx = Matrix<float>::rotate_x(rotate_x); 
+		Matrix<float> rmx = Matrix<float>::rotate_x(rotate_x);
 		Matrix<float> model = ((rmy*rmx)*tm);
 
 		// update light position
 		rotate_light_y += (5.0f*dt);
 		Matrix<float> lrm = Matrix<float>::rotate_y(rotate_light_y);
-		lights[0]->view_position = lrm.mult_vector(light_pos);
+		Matrix<float> lmodel = lrm;
+		lights[0]->view_position = lmodel.mult_vector(lights[0]->model_position);
 
 		// model view matrix
 		Matrix <float> mv = model * view;
@@ -254,7 +248,7 @@ int main(int argc, char *argv[]) {
 			Matrix<float> mvp_inv_tra = mvp_inv.transpose();
 
 			// transform normals
-			Matrix<float>::transform_vertices(visible_model.triangle_normals, 
+			Matrix<float>::transform_vertices(visible_model.triangle_normals,
 				mvp_inv_tra);
 			Vector::project_to_3d(visible_model.triangle_normals);
 
@@ -264,11 +258,11 @@ int main(int argc, char *argv[]) {
 			Vector::project_to_3d(visible_model.triangle_centers);
 
 			// calculate lighting
-			std::vector<lighting::LightResult> light_results = 
+			std::vector<lighting::LightResult> light_results =
 				lighting::calculate_lights(lights, visible_model);
 
 			// transform lightresults to colour
-			std::vector<SDL_Color> light_colours = 
+			std::vector<SDL_Color> light_colours =
 				lighting::lightresults_to_colours(light_results);
 
 			// replace visible model colours with lighted colours
@@ -299,12 +293,12 @@ int main(int argc, char *argv[]) {
 		}
 		std::stringstream msg_str;
 		msg_str << "FPS: " << fps;
-		text.render_string(0, 0, font, font_colour, msg_str.str()); 
+		text.render_string(0, 0, font, font_colour, msg_str.str());
 
 		// display angle
 		std::stringstream info_str;
-		info_str << "light x:" << lights[0]->view_position.x << 
-			" y: " << lights[0]->view_position.y << " z: " 
+		info_str << "light x:" << lights[0]->view_position.x <<
+			" y: " << lights[0]->view_position.y << " z: "
 			<< lights[0]->view_position.z << std::endl;
 		text.render_string(0, 15, font, font_colour, info_str.str());
 

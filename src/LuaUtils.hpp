@@ -25,10 +25,10 @@ namespace lu {
 			Vector, Vector, Vector, Vector>();
 		state["PointLight"].SetClass<lighting::PointLight,
 			Vector, Vector, Vector, Vector, Attenuation>();
-		state["PointLight"].SetClass<lighting::SpotLight, 
+		state["PointLight"].SetClass<lighting::SpotLight,
 			Vector, Vector, Vector, Vector, Attenuation, Vector,
 			double, double>();
-		// state["Surface"].SetClass<lighting::Surface, Vector, Vector, Vector, 
+		// state["Surface"].SetClass<lighting::Surface, Vector, Vector, Vector,
 		// 	double>();
 	}
 
@@ -41,7 +41,7 @@ namespace lu {
 	}
 
 	template<typename T, typename BaseT>
-	void read_obj_array(sel::State &state, 
+	void read_obj_array(sel::State &state,
 		std::vector<std::shared_ptr<BaseT>> &arr, std::string tbl_name) {
 		// get the table size of the arr
 		int tbl_size = table_size(state, tbl_name);
@@ -56,6 +56,13 @@ namespace lu {
 			arr.push_back(obj);
 		}
 	}
+
+	template<typename T>
+	T read_raw_obj(sel::Selector sel) {
+		sel::Pointer<T> obj_ptr = sel;
+		return (T)*obj_ptr.get();
+	}
+
 }
 
 #endif

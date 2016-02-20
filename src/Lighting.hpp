@@ -49,22 +49,24 @@ namespace lighting {
 	// base class for Light
 	class Light {
 	public:
-		Light(Vector view_position, Vector ambient, Vector diffuse,
+		Light(Vector model_position, Vector ambient, Vector diffuse,
 			Vector specular);
 		Light(const Light& other);
-		virtual lighting::LightResult calculate_light(lighting::Surface &surface, 
+		virtual lighting::LightResult calculate_light(lighting::Surface &surface,
 			Vector &position, Vector &normal) = 0;
 		virtual ~Light() = 0;
 
-		Vector view_position;
+		Vector model_position;
 		Vector ambient;
 		Vector diffuse;
 		Vector specular;
+
+		Vector view_position;
 	};
 
 	class PointLight: public Light {
 	public:
-		PointLight(Vector view_position, Vector ambient, Vector diffuse,
+		PointLight(Vector model_position, Vector ambient, Vector diffuse,
 			Vector specular, Attenuation attenuation);
 		PointLight(const PointLight& other);
 		lighting::LightResult calculate_light(lighting::Surface &surface,
@@ -76,7 +78,7 @@ namespace lighting {
 
 	class DirectionalLight: public Light {
 	public:
-		DirectionalLight(Vector view_position, Vector ambient, Vector diffuse,
+		DirectionalLight(Vector model_position, Vector ambient, Vector diffuse,
 			Vector specular);
 		DirectionalLight(const DirectionalLight& other);
 		lighting::LightResult calculate_light(lighting::Surface &surface,
@@ -86,8 +88,8 @@ namespace lighting {
 
 	class SpotLight: public Light {
 	public:
-		SpotLight(Vector view_position, Vector ambient, Vector diffuse,
-			Vector specular, Attenuation attenuation, Vector view_direction, 
+		SpotLight(Vector model_position, Vector ambient, Vector diffuse,
+			Vector specular, Attenuation attenuation, Vector view_direction,
 			float cutoff, float exponent);
 		SpotLight(const SpotLight& other);
 		lighting::LightResult calculate_light(lighting::Surface &surface,
@@ -102,7 +104,7 @@ namespace lighting {
 
 	float attenuate(float constant, float linear, float exponent, float d);
 	std::vector<lighting::LightResult> calculate_lights(
-		std::vector<std::shared_ptr<lighting::Light>> &lights, 
+		std::vector<std::shared_ptr<lighting::Light>> &lights,
 		model::Model &model);
 	std::vector<SDL_Color> lightresults_to_colours(
 		std::vector<lighting::LightResult> &lightresults);
