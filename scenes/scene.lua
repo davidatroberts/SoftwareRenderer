@@ -34,3 +34,11 @@ models = {
 	-- make_cube()
 	make_sphere(3)
 }
+
+-- updates the vector of lights
+function update_lights(light_size)
+	-- for i=0, light_count-1 do
+	-- 	local light_ptr = atpos(0)
+	-- 	local mx, my, mz, mw = get_model(light_ptr)
+	-- end
+end

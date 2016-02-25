@@ -18,16 +18,26 @@ namespace lu {
 	}
 
 	void initialise(sel::State &state) {
-		state["Vector"].SetClass<Vector, double, double, double, double>();
+		state["shared_ptr_light"].SetClass<std::shared_ptr<lighting::Light>>(
+			"get", &std::shared_ptr<lighting::Light>::get);
+		state["Vector"].SetClass<Vector, double, double, double, double>(
+			"x", &Vector::x, "y", &Vector::y, "z", &Vector::z, "w", &Vector::w);
 		state["Attenuation"].SetClass<Attenuation, double,
 			double, double>();
+
 		state["DirectionalLight"].SetClass<lighting::DirectionalLight,
 			Vector, Vector, Vector, Vector>();
 		state["PointLight"].SetClass<lighting::PointLight,
 			Vector, Vector, Vector, Vector, Attenuation>();
-		state["PointLight"].SetClass<lighting::SpotLight,
+		state["SpotLight"].SetClass<lighting::SpotLight,
 			Vector, Vector, Vector, Vector, Attenuation, Vector,
 			double, double>();
+		// state["VectorLights"].SetClass<
+		// 	std::vector<std::shared_ptr<lighting::Light>>>(
+		// 		"size", &std::vector<std::shared_ptr<lighting::Light>>::size);
+
+
+
 		// state["Surface"].SetClass<lighting::Surface, Vector, Vector, Vector,
 		// 	double>();
 	}

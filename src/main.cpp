@@ -105,6 +105,15 @@ int main(int argc, char *argv[]) {
 		"directional_lights");
 	lu::read_obj_array<lighting::SpotLight, lighting::Light>(scene, lights,
 		"spot_lights");
+	scene["atpos"] = [&lights](int i) {
+		return lights.at(i).get();
+	};
+	scene["get_model"] = [&scene](lighting::Light *l) {
+		Vector v = l->model_position;
+		return std::tuple<double, double, double, double>{v.x, v.y, v.z, v.w};
+	};
+
+	scene["update_lights"]((int)lights.size());
 
 	// load the models
 	std::vector<std::shared_ptr<model::Model>> models;
@@ -165,15 +174,12 @@ int main(int argc, char *argv[]) {
 		target, up);
 
 	// create the model
-	// model::Model mesh = model::cube();
-	// model::Model mesh = model::octahedron();
-	// model::Model mesh = model::sphere(3);
 	model::Model mesh = *models[0].get();
 	mesh.surface_attribute =  {
 		Vector(0.0, 0.0, 1.0),	// ambient
 		Vector(0.0, 0.0, 1.0), 	// diffuse
 		Vector(0.0, 0.0, 0.5),	// specular
-		0.01f 					// shineness
+		0.01f 									// shineness
 	};
 
 	// set the model position
