@@ -1,4 +1,7 @@
+#include <chaiscript/chaiscript.hpp>
+#include <chaiscript/chaiscript_stdlib.hpp>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <sstream>
 #include <stdio.h>
@@ -8,10 +11,10 @@
 #include "SDL/SDL_image.h"
 #include "SDL/SDL_ttf.h"
 #include "selene.h"
+#include "ChaiUtil.hpp"
 #include "Debug.hpp"
 #include "Graphics.hpp"
 #include "Lighting.hpp"
-#include "LuaUtils.hpp"
 #include "Matrix.hpp"
 #include "Model.hpp"
 #include "Pipeline.hpp"
@@ -78,46 +81,31 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	// load the scene file
-	sel::State scene;
-	lu::initialise(scene);
-	lu::initialise_model(scene);
-	if (!scene.Load(std::string(argv[1]))) {
-		std::cerr << "Error loading scene file" << std::endl;
-		return 1;
-	}
+	// load ChaiScript
+	chaiscript::ChaiScript chai(chaiscript::Std_Lib::library());
+	ch::initialise(chai);
+	chai.eval_file(std::string(argv[1]));
 
 	// screen settings
-	const int SCREEN_WIDTH = scene["display"]["width"];
-	const int SCREEN_HEIGHT = scene["display"]["height"];
-	const int SCREEN_BPP = scene["display"]["bpp"];
+	const int SCREEN_WIDTH = chai.eval<int>("width");
+	const int SCREEN_HEIGHT = chai.eval<int>("height");
+	const int SCREEN_BPP = chai.eval<int>("bpp");
 
 	// camera settings
-	Vector camera_pos = lu::read_raw_obj<Vector>(scene["camera"]["position"]);
-	Vector target = lu::read_raw_obj<Vector>(scene["camera"]["target"]);
-	Vector up = lu::read_raw_obj<Vector>(scene["camera"]["up"]);
+	Vector camera_pos = chai.eval<Vector>("camera_position");
+	Vector target = chai.eval<Vector>("camera_target");
+	Vector up = chai.eval<Vector>("camera_up");
 
 	// add the lights to the scene
 	std::vector<std::shared_ptr<lighting::Light>> lights;
-	lu::read_obj_array<lighting::PointLight, lighting::Light>(scene, lights,
-		"point_lights");
-	lu::read_obj_array<lighting::DirectionalLight, lighting::Light>(scene, lights,
-		"directional_lights");
-	lu::read_obj_array<lighting::SpotLight, lighting::Light>(scene, lights,
-		"spot_lights");
-	scene["atpos"] = [&lights](int i) {
-		return lights.at(i).get();
-	};
-	scene["get_model"] = [&scene](lighting::Light *l) {
-		Vector v = l->model_position;
-		return std::tuple<double, double, double, double>{v.x, v.y, v.z, v.w};
-	};
-
-	scene["update_lights"]((int)lights.size());
+	chai.add_global(chaiscript::var(std::ref(lights)), "light_list");
+	chai.eval("initialise_lights()");
 
 	// load the models
-	std::vector<std::shared_ptr<model::Model>> models;
-	lu::read_obj_array<model::Model, model::Model>(scene, models, "models");
+	std::vector<model::Model> models;
+	chai.add_global(chaiscript::var(std::ref(models)), "model_list");
+	chai.eval("initialise_models()");
+	// models.push_back(model::sphere(3));
 
 	// init SDL
 	if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) == -1) {
@@ -174,7 +162,7 @@ int main(int argc, char *argv[]) {
 		target, up);
 
 	// create the model
-	model::Model mesh = *models[0].get();
+	model::Model mesh = models[0];
 	mesh.surface_attribute =  {
 		Vector(0.0, 0.0, 1.0),	// ambient
 		Vector(0.0, 0.0, 1.0), 	// diffuse
