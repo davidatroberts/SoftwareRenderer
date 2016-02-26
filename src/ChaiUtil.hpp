@@ -45,9 +45,17 @@ namespace ch {
     chai.add(chaiscript::bootstrap::standard_library::vector_type<
   		std::vector<std::shared_ptr<lighting::Light>>>("LightList"));
 
+    chai.add(chaiscript::user_type<lighting::Surface>(), "Surface");
+    chai.add(chaiscript::constructor<lighting::Surface(Vector, Vector,
+      Vector, float)>(), "Surface");
+    chai.add(chaiscript::fun(&lighting::Surface::operator=), "=");
+
 
     // Model
     chai.add(chaiscript::user_type<model::Model>(), "Model");
+    chai.add(chaiscript::fun(&model::Model::surface_attribute),
+      "surface_attribute");
+
     chai.add(chaiscript::bootstrap::standard_library::vector_type<
       std::vector<model::Model>>("ModelList"));
 

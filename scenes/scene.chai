@@ -19,7 +19,13 @@ def initialise_lights() {
 }
 
 def initialise_models() {
-  model_list.push_back(
-    make_sphere(3)
+  auto m = make_sphere(3);
+  m.surface_attribute = Surface(
+    Vector4(0.0, 0.0, 1.0, 1.0),
+    Vector4(0.0, 0.0, 1.0, 1.0),
+    Vector4(0.0, 0.0, 0.5, 1.0),
+    0.01
   );
+
+  model_list.push_back(m);
 }

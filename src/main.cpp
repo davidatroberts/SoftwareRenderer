@@ -105,7 +105,6 @@ int main(int argc, char *argv[]) {
 	std::vector<model::Model> models;
 	chai.add_global(chaiscript::var(std::ref(models)), "model_list");
 	chai.eval("initialise_models()");
-	// models.push_back(model::sphere(3));
 
 	// init SDL
 	if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) == -1) {
@@ -163,12 +162,6 @@ int main(int argc, char *argv[]) {
 
 	// create the model
 	model::Model mesh = models[0];
-	mesh.surface_attribute =  {
-		Vector(0.0, 0.0, 1.0),	// ambient
-		Vector(0.0, 0.0, 1.0), 	// diffuse
-		Vector(0.0, 0.0, 0.5),	// specular
-		0.01f 									// shineness
-	};
 
 	// set the model position
 	Vector mesh_position(0.0f, 0.0f, 0.0f);

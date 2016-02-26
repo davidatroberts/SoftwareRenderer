@@ -12,6 +12,22 @@ namespace model {
 namespace lighting {
 	// struct for storing face attributes
 	struct Surface {
+		Surface(){
+		}
+		Surface(Vector ambient, Vector diffuse, Vector specular,
+			float shininess)
+		:ambient(ambient), diffuse(diffuse), specular(specular),
+		shininess(shininess) {
+		}
+
+		Surface& operator=(Surface other) {
+			std::swap(ambient, other.ambient);
+			std::swap(diffuse, other.diffuse);
+			std::swap(specular, other.specular);
+			std::swap(shininess, other.shininess);
+			return *this;
+		}
+
 		Vector ambient;
 		Vector diffuse;
 		Vector specular;
