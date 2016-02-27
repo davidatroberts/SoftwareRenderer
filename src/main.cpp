@@ -18,6 +18,7 @@
 #include "Matrix.hpp"
 #include "Model.hpp"
 #include "Pipeline.hpp"
+#include "Scene.hpp"
 #include "Text.hpp"
 #include "Timer.hpp"
 #include "Vector.hpp"
