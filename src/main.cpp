@@ -10,7 +10,6 @@
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
 #include "SDL/SDL_ttf.h"
-#include "selene.h"
 #include "ChaiUtil.hpp"
 #include "Debug.hpp"
 #include "Graphics.hpp"
