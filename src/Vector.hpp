@@ -13,16 +13,17 @@ public:
 	float dot(Vector &other);
 	Vector normalized();
 	Vector project_to_3d();
-	Vector reflect(Vector &normal);			// reflect vector around normal
+	Vector reflect(Vector &normal);					// reflect vector around normal
 
-	Vector operator*(float scalar);			// scalar multiplication
-	Vector operator/(float scalar);			// scalar division
-	Vector operator*(const Vector& vec);	// element-wise multiplication
-	Vector operator+(const Vector& vec); 	// addition
-	Vector operator-(const Vector& vec); 	// subtraction
-	Vector operator^(const Vector& vec);	// cross
+	Vector operator*(float scalar);					// scalar multiplication
+	Vector operator/(float scalar);					// scalar division
+	Vector operator*(const Vector& vec);		// element-wise multiplication
+	Vector operator+(const Vector& vec); 		// addition
+	Vector operator-(const Vector& vec); 		// subtraction
+	Vector operator^(const Vector& vec);		// cross
 	Vector& operator+=(const Vector& vec);	// assign addition
 	Vector& operator-=(const Vector& vec);	// assign subtraction
+	Vector& operator=(Vector other);				// assignment
 
 	static void project_to_3d(std::vector<Vector> &vertices);
 	static void normalize(std::vector<Vector> &vectors);

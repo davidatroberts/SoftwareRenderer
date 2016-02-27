@@ -1,6 +1,7 @@
 #include "Vector.hpp"
 
 #include <cmath>
+#include <utility>
 
 Vector::Vector(float x, float y, float z, float w)
 : x(x), y(y), z(z), w(w) {
@@ -102,6 +103,14 @@ Vector& Vector::operator-=(const Vector& other) {
 	return *this;
 }
 
+Vector& Vector::operator=(Vector other) {
+	std::swap(x, other.x);
+	std::swap(y, other.y);
+	std::swap(z, other.z);
+	std::swap(w, other.w);
+	return *this;
+}
+
 void Vector::project_to_3d(std::vector<Vector> &vertices) {
 	for (int i=0; i<vertices.size(); ++i) {
 		vertices[i] = vertices[i].project_to_3d();
@@ -169,4 +178,3 @@ std::ostream& operator<<(std::ostream &strm, Vector &v) {
 	strm << "(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
 	return strm;
 }
-

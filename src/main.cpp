@@ -39,7 +39,6 @@ bool quit = false;
 
 float rotate_y = 90.0f;
 float rotate_x = 0.0f;
-float rotate_light_y = 0.0;
 
 // calculating FPS
 int frame_count = 0;
@@ -100,6 +99,7 @@ int main(int argc, char *argv[]) {
 	std::vector<std::shared_ptr<lighting::Light>> lights;
 	chai.add_global(chaiscript::var(std::ref(lights)), "light_list");
 	chai.eval("initialise_lights()");
+	auto update_lights = chai.eval<std::function<void (float)>>("update_lights");
 
 	// load the models
 	std::vector<model::Model> models;
@@ -193,6 +193,9 @@ int main(int argc, char *argv[]) {
 			handle_event(event);
 		}
 
+		// update light position
+		update_lights(dt);
+
 		// world model transform
 		Matrix<float> tm = Matrix<float>::translate(
 			mesh_position.x, mesh_position.y, mesh_position.z);
@@ -200,12 +203,6 @@ int main(int argc, char *argv[]) {
 		Matrix<float> rmy = Matrix<float>::rotate_y(rotate_y);
 		Matrix<float> rmx = Matrix<float>::rotate_x(rotate_x);
 		Matrix<float> model = ((rmy*rmx)*tm);
-
-		// update light position
-		rotate_light_y += (5.0f*dt);
-		Matrix<float> lrm = Matrix<float>::rotate_y(rotate_light_y);
-		Matrix<float> lmodel = lrm;
-		lights[0]->view_position = lmodel.mult_vector(lights[0]->model_position);
 
 		// model view matrix
 		Matrix <float> mv = model * view;

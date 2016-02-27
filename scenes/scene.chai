@@ -1,11 +1,17 @@
+// display settings
 var width = 640;
 var height = 480;
 var bpp = 16;
 
+// camera settings
 var camera_position = Vector4(0.0, 0.0, 10.0, 1.0);
 var camera_target = Vector4(0.0, 0.0, 0.0, 1.0);
 var camera_up = Vector4(0.0, 1.0, 0.0, 1.0);
 
+// light
+global rotate_light_y = 0.0;
+
+// initialisation
 def initialise_lights() {
   auto l1 = DirectionalLight(
     Vector4(2.4, 0.0, 0.0, 0.0),
@@ -28,4 +34,11 @@ def initialise_models() {
   );
 
   model_list.push_back(m);
+}
+
+def update_lights(float dt) {
+  rotate_light_y -= (5.0*dt);
+  auto lmodel = Matrix_rotate_y(rotate_light_y);
+  auto light = light_list[0];
+  light.view_position = lmodel.mult_vector(light.model_position);
 }
