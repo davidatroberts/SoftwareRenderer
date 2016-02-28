@@ -11,7 +11,7 @@ var camera_up = Vector4(0.0, 1.0, 0.0, 1.0);
 // light
 global rotate_light_y = 0.0;
 
-// initialisation
+// add the lights to the scene
 def initialise_lights() {
   auto l1 = DirectionalLight(
     Vector4(2.4, 0.0, 0.0, 0.0),
@@ -24,18 +24,7 @@ def initialise_lights() {
 
 }
 
-def initialise_models() {
-  auto m = make_sphere(3);
-  m.surface_attribute = Surface(
-    Vector4(0.0, 0.0, 1.0, 1.0),
-    Vector4(0.0, 0.0, 1.0, 1.0),
-    Vector4(0.0, 0.0, 0.5, 1.0),
-    0.01
-  );
-
-  model_list.push_back(m);
-}
-
+// add the objects to the scene
 def initialise_scene_objects() {
   auto scene_object = SceneObject();
 
@@ -56,6 +45,7 @@ def initialise_scene_objects() {
   scene_list.push_back(scene_object);
 }
 
+// update the positions of the lights
 def update_lights(float dt) {
   rotate_light_y -= (5.0*dt);
   auto lmodel = Matrix_rotate_y(rotate_light_y);
