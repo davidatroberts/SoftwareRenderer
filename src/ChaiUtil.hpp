@@ -5,6 +5,7 @@
 #include "Lighting.hpp"
 #include "Matrix.hpp"
 #include "Model.hpp"
+#include "Scene.hpp"
 #include "Vector.hpp"
 
 namespace ch {
@@ -78,6 +79,25 @@ namespace ch {
     chai.add(chaiscript::fun(&model::octahedron), "make_octahedron");
     chai.add(chaiscript::fun(&model::sphere), "make_sphere");
 
+    // Scene
+    chai.add(chaiscript::user_type<scene::Component>(), "Component");
+
+    chai.add(chaiscript::user_type<scene::SceneObject>(), "SceneObject");
+    chai.add(chaiscript::constructor<scene::SceneObject()>(), "SceneObject");
+    chai.add(chaiscript::fun(&scene::SceneObject::add_component),
+      "add_component");
+
+    chai.add(chaiscript::bootstrap::standard_library::vector_type<
+      std::vector<scene::SceneObject>>("SceneList"));
+
+    chai.add(chaiscript::user_type<scene::RenderModelComponent>(),
+      "RenderModelComponent");
+    chai.add(chaiscript::base_class<scene::Component,
+      scene::RenderModelComponent>());
+    chai.add(chaiscript::constructor<scene::RenderModelComponent(
+      model::Model, Vector&, Matrix<float>&,
+      std::vector<std::shared_ptr<lighting::Light>>&,
+      std::vector<model::Model>&)>(), "RenderModelComponent");
   }
 }
 

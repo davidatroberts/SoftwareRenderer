@@ -37,9 +37,6 @@
 
 bool quit = false;
 
-float rotate_y = 90.0f;
-float rotate_x = 0.0f;
-
 // calculating FPS
 int frame_count = 0;
 float fps = 0;
@@ -95,22 +92,16 @@ int main(int argc, char *argv[]) {
 	Vector target = chai.eval<Vector>("camera_target");
 	Vector up = chai.eval<Vector>("camera_up");
 
-	// initialise the objects in the scene
-	std::vector<scene::SceneObject> scene_objects;
-
 	// add the lights to the scene
 	std::vector<std::shared_ptr<lighting::Light>> lights;
 	chai.add_global(chaiscript::var(std::ref(lights)), "light_list");
 	chai.eval("initialise_lights()");
 	auto update_lights = chai.eval<std::function<void (float)>>("update_lights");
 
-	// load the models
-	std::vector<model::Model> models;
-	chai.add_global(chaiscript::var(std::ref(models)), "model_list");
-	chai.eval("initialise_models()");
-
 	// models to render each loop
 	std::vector<model::Model> visible_models;
+	chai.add_global(chaiscript::var(std::ref(visible_models)),
+		"visible_models");
 
 	// init SDL
 	if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) == -1) {
@@ -166,11 +157,15 @@ int main(int argc, char *argv[]) {
 	Matrix<float> view = Matrix<float>::lookat(camera_pos,
 		target, up);
 
-	// create the model
-	model::Model mesh = models[0];
+	// view projection
+	Matrix<float> view_projection = view*projection;
+	chai.add_global(chaiscript::var(std::ref(view_projection)),
+		"view_projection");
 
-	// set the model position
-	Vector mesh_position(0.0f, 0.0f, 0.0f);
+	// initialise the objects in the scene
+	std::vector<scene::SceneObject> scene_objects;
+	chai.add_global(chaiscript::var(std::ref(scene_objects)), "scene_list");
+	chai.eval("initialise_scene_objects()");
 
 	// timing
 	uint32_t old_time, current_time;
