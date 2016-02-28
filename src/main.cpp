@@ -95,6 +95,9 @@ int main(int argc, char *argv[]) {
 	Vector target = chai.eval<Vector>("camera_target");
 	Vector up = chai.eval<Vector>("camera_up");
 
+	// initialise the objects in the scene
+	std::vector<scene::SceneObject> scene_objects;
+
 	// add the lights to the scene
 	std::vector<std::shared_ptr<lighting::Light>> lights;
 	chai.add_global(chaiscript::var(std::ref(lights)), "light_list");
@@ -105,6 +108,9 @@ int main(int argc, char *argv[]) {
 	std::vector<model::Model> models;
 	chai.add_global(chaiscript::var(std::ref(models)), "model_list");
 	chai.eval("initialise_models()");
+
+	// models to render each loop
+	std::vector<model::Model> visible_models;
 
 	// init SDL
 	if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) == -1) {
@@ -193,69 +199,16 @@ int main(int argc, char *argv[]) {
 			handle_event(event);
 		}
 
+		// clear the old displayed models
+		visible_models.clear();
+
 		// update light position
 		update_lights(dt);
 
-		// world model transform
-		Matrix<float> tm = Matrix<float>::translate(
-			mesh_position.x, mesh_position.y, mesh_position.z);
-		// rotate_y += (20.0f*dt);
-		Matrix<float> rmy = Matrix<float>::rotate_y(rotate_y);
-		Matrix<float> rmx = Matrix<float>::rotate_x(rotate_x);
-		Matrix<float> model = ((rmy*rmx)*tm);
-
-		// model view matrix
-		Matrix <float> mv = model * view;
-
-		// projection transform
-		Matrix<float> mvp = mv * projection;
-
-		// inverse model transform
-		Matrix<float> model_inv = model.inverse();
-
-		// camera position in model space
-		Vector camera_pos_model = model_inv.mult_vector(camera_pos);
-
-		// copy of original
-		model::Model visible_model = mesh;
-
-		// backface culling
-		visible_model = pipeline::backface_cull(mesh, camera_pos_model);
-
-		// transform vertices
-		pipeline::transform_vertices(visible_model, mvp);
-
-		// calculate lighting (if any)
-		if (lights.size() > 0) {
-			// calculate transpose of inverse mvp matrix
-			Matrix<float> mvp_inv = mvp.inverse();
-			Matrix<float> mvp_inv_tra = mvp_inv.transpose();
-
-			// transform normals
-			Matrix<float>::transform_vertices(visible_model.triangle_normals,
-				mvp_inv_tra);
-			Vector::project_to_3d(visible_model.triangle_normals);
-
-			// transform face centers
-			Matrix<float>::transform_vertices(visible_model.triangle_centers,
-				mvp);
-			Vector::project_to_3d(visible_model.triangle_centers);
-
-			// calculate lighting
-			std::vector<lighting::LightResult> light_results =
-				lighting::calculate_lights(lights, visible_model);
-
-			// transform lightresults to colour
-			std::vector<SDL_Color> light_colours =
-				lighting::lightresults_to_colours(light_results);
-
-			// replace visible model colours with lighted colours
-			visible_model.colours = light_colours;
+		// update all of the objects in the scene
+		for (scene::SceneObject scene_object: scene_objects) {
+			scene_object.update(dt);
 		}
-
-		// map to screen coordinates
-		std::vector<Fragment> frags = pipeline::to_screen_coordinates(
-			graphics, visible_model);
 
 		// lock screen
 		if (SDL_MUSTLOCK(screen))
@@ -267,8 +220,14 @@ int main(int argc, char *argv[]) {
 		// clear the old depth buffer
 		graphics.clear_zbuffer();
 
-		// rasterise the triangles
-		pipeline::rasterise(graphics, visible_model, frags);
+		// loop through visible models and display
+		for (model::Model visible_model: visible_models) {
+			std::vector<Fragment> frags = pipeline::to_screen_coordinates(
+				graphics, visible_model);
+
+			// rasterise the triangles
+			pipeline::rasterise(graphics, visible_model, frags);
+		}
 
 		// calculate FPS
 		if (caption_update_timer.ticks() > 1000) {

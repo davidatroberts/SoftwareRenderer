@@ -3,7 +3,10 @@
 
 #include <memory>
 #include <vector>
+#include "Lighting.hpp"
+#include "Matrix.hpp"
 #include "Model.hpp"
+#include "Vector.hpp"
 
 namespace scene {
 
@@ -12,6 +15,7 @@ namespace scene {
   class Component {
   public:
     Component();
+
 
     virtual void update(SceneObject &object, float dt) = 0;
 
@@ -28,21 +32,30 @@ namespace scene {
 
     ~SceneObject();
 
+    Vector position;
+    Vector rotation;
   private:
-    std::vector<std::shared_ptr<Component>> components;
+    std::vector<std::shared_ptr<Component>> components_;
   };
 
   // compoent for rendering 3D models
   class RenderModelComponent: public Component {
   public:
-    RenderModelComponent(model::Model component_model);
+    RenderModelComponent(model::Model component_model,
+      Vector& camera_position, Matrix<float>& view_projection_,
+      std::vector<std::shared_ptr<lighting::Light>>& lights,
+      std::vector<model::Model>& model_list);
 
     void update(SceneObject &object, float dt);
 
     ~RenderModelComponent();
 
   private:
-    model::Model component_model;
+    model::Model component_model_;
+    Vector& camera_position_;
+    Matrix<float>& view_projection_;
+    std::vector<std::shared_ptr<lighting::Light>>& lights_;
+    std::vector<model::Model>& model_list_;
   };
 }
 
