@@ -86,6 +86,9 @@ namespace ch {
     chai.add(chaiscript::constructor<scene::SceneObject()>(), "SceneObject");
     chai.add(chaiscript::fun(&scene::SceneObject::add_component),
       "add_component");
+    chai.add(chaiscript::fun(&scene::SceneObject::position), "position");
+    chai.add(chaiscript::fun(&scene::SceneObject::scale), "scale");
+    chai.add(chaiscript::fun(&scene::SceneObject::rotation), "rotation");
 
     chai.add(chaiscript::bootstrap::standard_library::vector_type<
       std::vector<scene::SceneObject>>("SceneList"));

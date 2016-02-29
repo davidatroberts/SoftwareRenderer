@@ -34,6 +34,8 @@ namespace scene {
 
     Vector position;
     Vector rotation;
+    Vector scale;
+
   private:
     std::vector<std::shared_ptr<Component>> components_;
   };

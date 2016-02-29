@@ -26,28 +26,44 @@ def initialise_lights() {
 
 // add the objects to the scene
 def initialise_scene_objects() {
-  auto scene_object = SceneObject();
-
-  auto m = make_sphere(3);
-  m.surface_attribute = Surface(
+  auto scene_object1 = SceneObject();
+  scene_object1.scale = Vector4(0.5, 0.5, 0.5, 1.0);
+  scene_object1.position = Vector4(2.5, 0.0, 0.0, 1.0);
+  auto m1 = make_sphere(3);
+  m1.surface_attribute = Surface(
     Vector4(0.0, 0.0, 1.0, 1.0),
     Vector4(0.0, 0.0, 1.0, 1.0),
     Vector4(0.0, 0.0, 0.5, 1.0),
     0.01
   );
-
-  auto render_component = RenderModelComponent(
-    m, camera_position, view_projection, light_list, visible_models
+  auto render_component1 = RenderModelComponent(
+    m1, camera_position, view_projection, light_list, visible_models
   );
+  scene_object1.add_component(render_component1);
 
-  scene_object.add_component(render_component);
+  auto scene_object2 = SceneObject();
+  scene_object2.scale = Vector4(0.5, 0.5, 0.5, 1.0);
+  scene_object2.position = Vector4(-2.5, 0.0, 0.0, 1.0);
+  scene_object2.rotation = Vector4(0.0, 15.0, 0.0, 1.0);
+  auto m2 = make_cube();
+  m2.surface_attribute = Surface(
+    Vector4(0.5, 0.0, 0.0, 1.0),
+    Vector4(0.8, 0.0, 0.0, 1.0),
+    Vector4(0.8, 0.0, 0.0, 1.0),
+    0.1
+  );
+  auto render_component2 = RenderModelComponent(
+    m2, camera_position, view_projection, light_list, visible_models
+  );
+  scene_object2.add_component(render_component2);
 
-  scene_list.push_back(scene_object);
+  scene_list.push_back(scene_object1);
+  scene_list.push_back(scene_object2);
 }
 
 // update the positions of the lights
 def update_lights(float dt) {
-  rotate_light_y -= (5.0*dt);
+  rotate_light_y += (5.0*dt);
   auto lmodel = Matrix_rotate_y(rotate_light_y);
   auto light = light_list[0];
   light.view_position = lmodel.mult_vector(light.model_position);

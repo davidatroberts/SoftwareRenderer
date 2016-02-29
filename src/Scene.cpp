@@ -10,7 +10,8 @@ Component::Component() {
 Component::~Component() {
 }
 
-SceneObject::SceneObject() {
+SceneObject::SceneObject()
+:scale(Vector(1.0, 1.0, 1.0)) {
 }
 
 void SceneObject::update(float dt) {
@@ -36,6 +37,8 @@ view_projection_(view_projection), lights_(lights), model_list_(model_list) {
 
 void RenderModelComponent::update(SceneObject &object, float dt) {
   // should be scripted
+  Matrix<float> sm = Matrix<float>::scale(object.scale.x,
+    object.scale.y, object.scale.z);
   Matrix<float> tm = Matrix<float>::translate(
     object.position.x, object.position.y, object.position.z
   );
@@ -43,7 +46,7 @@ void RenderModelComponent::update(SceneObject &object, float dt) {
   Matrix<float> rmy = Matrix<float>::rotate_y(object.rotation.y);
   Matrix<float> rmx = Matrix<float>::rotate_x(object.rotation.x);
 
-  Matrix<float> model = ((rmz*rmy*rmx)*tm);
+  Matrix<float> model = ((rmz*rmy*rmx)*tm)*sm;
 
   // projection transform
   Matrix<float> mvp = model * view_projection_;

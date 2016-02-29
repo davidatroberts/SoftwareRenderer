@@ -233,13 +233,6 @@ int main(int argc, char *argv[]) {
 		msg_str << "FPS: " << fps;
 		text.render_string(0, 0, font, font_colour, msg_str.str());
 
-		// display angle
-		std::stringstream info_str;
-		info_str << "light x:" << lights[0]->view_position.x <<
-			" y: " << lights[0]->view_position.y << " z: "
-			<< lights[0]->view_position.z << std::endl;
-		text.render_string(0, 15, font, font_colour, info_str.str());
-
 		// unlock screen
 		if (SDL_MUSTLOCK(screen))
 			SDL_UnlockSurface(screen);
