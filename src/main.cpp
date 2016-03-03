@@ -19,6 +19,7 @@
 #include "Pipeline.hpp"
 #include "Scene.hpp"
 #include "Text.hpp"
+#include "Texture.hpp"
 #include "Timer.hpp"
 #include "Vector.hpp"
 

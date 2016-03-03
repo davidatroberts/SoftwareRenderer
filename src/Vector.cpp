@@ -4,7 +4,7 @@
 #include <utility>
 
 Vector::Vector(float x, float y, float z, float w)
-: x(x), y(y), z(z), w(w) {
+:x(x), y(y), z(z), w(w) {
 
 }
 
