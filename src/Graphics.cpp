@@ -33,7 +33,7 @@ void Graphics::draw_pixel(int x, int y, SDL_Colour &colour) {
 		return;
 
 	// get uint16_t colour
-	uint16_t mapped_colour = SDL_MapRGB(format_, 
+	uint16_t mapped_colour = SDL_MapRGB(format_,
 		colour.r, colour.g, colour.b);
 
 	// update buffer
@@ -46,14 +46,14 @@ void Graphics::draw_pixel(int x, int y, float z, SDL_Colour &colour) {
 		return;
 
 	// end if z is greater than z_buffer
-	if (z >= z_buffer_[y * width_ + x]) 
+	if (z >= z_buffer_[y * width_ + x])
 		return;
 
 	// update z_buffer
 	z_buffer_[y * width_ + x] = z;
 
 	// get uint16_t colour
-	uint16_t mapped_colour = SDL_MapRGB(format_, 
+	uint16_t mapped_colour = SDL_MapRGB(format_,
 		colour.r, colour.g, colour.b);
 
 	// update buffer
@@ -154,7 +154,7 @@ void Graphics::line(Fragment &f1, Fragment &f2, SDL_Colour &colour) {
 }
 
 // Bresenham's triangle algorithm
-void Graphics::triangle(Fragment &p1, Fragment &p2, Fragment &p3, 
+void Graphics::triangle(Fragment &p1, Fragment &p2, Fragment &p3,
 	SDL_Colour &colour) {
 	// sort so that p1 is at the top
 	sort_points(p1, p2, p3);
@@ -170,16 +170,16 @@ void Graphics::triangle(Fragment &p1, Fragment &p2, Fragment &p3,
 	else {
 		// general case, split into two triangles
 		// top-flat and bottom-flat
-		
+
 		// calculate the z position for p4
 		float z = p1.z + (p3.z - p1.z) * (((float)p2.y-(float)p1.y)/
 			((float)p3.y-(float)p1.y));
 
 		// create p4
 		Fragment p4 = {
-			 (int)(p1.x + ((float)(p2.y - p1.y) / (float)(p3.y - p1.y)) 
+			 (int)(p1.x + ((float)(p2.y - p1.y) / (float)(p3.y - p1.y))
 			 	* (p3.x - p1.x)),
-			 p2.y, 
+			 p2.y,
 			 z
 		};
 
@@ -251,11 +251,11 @@ Fragment Graphics::to_screen(Vector &v) {
 		0
 	};
 
-	return f; 
+	return f;
 }
 
 // Bresenham's triangle algorithm
-void Graphics::flat_triangle(Fragment &p1, Fragment &p2, Fragment &p3, 
+void Graphics::flat_triangle(Fragment &p1, Fragment &p2, Fragment &p3,
 	SDL_Colour &colour) {
 	Fragment ptemp1 = {p1.x, p1.y, p1.z};
 	Fragment ptemp2 = {p1.x, p1.y, p1.z};

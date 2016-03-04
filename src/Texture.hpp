@@ -15,6 +15,8 @@ public:
   SDL_Colour map(Vector2 uv);
 
 private:
+  SDL_Colour get_texel(int x, int y);
+
   std::unique_ptr<SDL_Surface> texture_;
 };
 
