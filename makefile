@@ -42,6 +42,6 @@ debug_osx:
 
 .PHONEY: clean
 clean:
-	@rm -rf $(BIN_DIR)
-	@rm -rf $(OBJ_DIR)
-	@rm -rf $(TST_OBJ_DIR)
+	@rm -f $(BIN_DIR)/*
+	@rm -f $(OBJ_DIR)/*
+	@rm -f $(TST_OBJ_DIR)/*
