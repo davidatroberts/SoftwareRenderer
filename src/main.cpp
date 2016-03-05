@@ -23,18 +23,18 @@
 #include "Timer.hpp"
 #include "Vector.hpp"
 
-#define UP_BTN 							SDLK_UP
+#define UP_BTN							SDLK_UP
 #define DOWN_BTN 						SDLK_DOWN
 #define LEFT_BTN 						SDLK_LEFT
-#define RIGHT_BTN 					SDLK_RIGHT
+#define RIGHT_BTN						SDLK_RIGHT
 #define A_BTN 							SDLK_LCTRL
 #define B_BTN 							SDLK_LALT
 #define X_BTN 							SDLK_SPACE
 #define Y_BTN 							SDLK_LSHIFT
-#define LEFT_SHOULDER_BTN 	SDLK_TAB
-#define RIGHT_SHOULDER_BTN 	SDLK_BACKSPACE
-#define SELECT_BTN 					SDLK_ESCAPE
-#define START_BTN 					SDLK_RETURN
+#define LEFT_SHOULDER_BTN		SDLK_TAB
+#define RIGHT_SHOULDER_BTN	SDLK_BACKSPACE
+#define SELECT_BTN					SDLK_ESCAPE
+#define START_BTN						SDLK_RETURN
 
 bool quit = false;
 

@@ -1,6 +1,7 @@
 #include "Texture.hpp"
 
 #include <cmath>
+#include "SDLUtil.hpp"
 
 Texture::Texture() {
 
@@ -37,6 +38,12 @@ SDL_Colour Texture::map(Vector2 uv) {
   SDL_Colour top_left = get_texel(x_wrap, y_wrap+1);
   SDL_Colour top_right = get_texel(x_wrap+1, y_wrap+1);
 
+  // interpolate between the points
+  SDL_Colour bottom_middle = sdl_util::lerp(bottom_left, bottom_right, x_frac);
+  SDL_Colour top_middle = sdl_util::lerp(top_left, top_right, x_frac);
+  SDL_Colour point = sdl_util::lerp(bottom_middle, top_middle, y_frac);
+
+  return point;
 }
 
 SDL_Colour Texture::get_texel(int x, int y) {

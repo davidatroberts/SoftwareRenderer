@@ -98,12 +98,10 @@ go_bandit([]() {
 		});
 
 		it("can reflect", [&]() {
-			Vector normal(0, 1, 0);
-			Vector v(1, 0, 0);
-
-			Vector result = v.reflect(normal);
-			std::cout << result << std::endl;
-			
+			// Vector normal(0, 1, 0);
+			// Vector v(1, 0, 0);
+			//
+			// Vector result = v.reflect(normal);
 		});
 	});
 });
