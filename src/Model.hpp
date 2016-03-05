@@ -6,6 +6,7 @@
 #include "Graphics.hpp"
 #include "Lighting.hpp"
 #include "Vector.hpp"
+#include "Vector2.hpp"
 
 namespace model {
 	// all indices in clockwise order
@@ -16,6 +17,7 @@ namespace model {
 		std::vector<bool> visible_vertices;
 		std::vector<Triangle> triangles;
 		std::vector<SDL_Colour> colours;
+		std::vector<Vector2> uv_coordinates;
 		lighting::Surface surface_attribute;
 	};
 	typedef struct Model Model;
@@ -23,7 +25,7 @@ namespace model {
 	void calculate_normals(model::Model &model);
 	void calculate_centers(model::Model &model);
 	void create_octahedron(model::Model &model, int resolution);
-	int create_vertex_line(Vector &from, Vector &to, 
+	int create_vertex_line(Vector &from, Vector &to,
 		std::vector<Vector> &vertices, int steps, int v);
 	int create_lower_strip(std::vector<Triangle> &triangles, int steps, int v_top,
 		int v_bottom, int tri_index);

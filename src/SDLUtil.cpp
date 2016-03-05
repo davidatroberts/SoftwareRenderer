@@ -6,12 +6,7 @@ namespace sdl_util {
 		uint8_t green = (uint8_t)(((float)c1.g)*(1.0f-alpha) + ((float)c2.g)*alpha);
 		uint8_t blue = (uint8_t)(((float)c1.b)*(1.0f-alpha) + ((float)c2.b)*alpha);
 
-		SDL_Colour col = {
-			red,
-			green,
-			blue
-		};
-
+		SDL_Colour col = {red, green, blue};
 		return col;
   }
 }
