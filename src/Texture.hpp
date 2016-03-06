@@ -17,7 +17,8 @@ public:
 private:
   SDL_Colour get_texel(int x, int y);
 
-  std::unique_ptr<SDL_Surface> texture_;
+	bool loaded_;
+  std::shared_ptr<SDL_Surface> texture_;
 };
 
 #endif

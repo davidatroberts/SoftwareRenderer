@@ -6,7 +6,9 @@
 #include "Matrix.hpp"
 #include "Model.hpp"
 #include "Scene.hpp"
+#include "Texture.hpp"
 #include "Vector.hpp"
+#include "Vector2.hpp"
 
 namespace ch {
   void initialise(chaiscript::ChaiScript &chai) {
@@ -18,6 +20,14 @@ namespace ch {
     chai.add(chaiscript::fun(&Vector::z), "z");
     chai.add(chaiscript::fun(&Vector::w), "w");
     chai.add(chaiscript::fun(&Vector::operator=), "=");
+
+		chai.add(chaiscript::user_type<Vector2>(), "Vector2");
+		chai.add(chaiscript::constructor<Vector2(float, float)>(),
+			"Vector2");
+		chai.add(chaiscript::fun(&Vector2::x), "x");
+		chai.add(chaiscript::fun(&Vector2::y), "y");
+		chai.add(chaiscript::bootstrap::standard_library::vector_type<
+  		std::vector<Vector2>>("Vector2List"));
 
     chai.add(chaiscript::user_type<Matrix<float>>(), "Matrix");
     chai.add(chaiscript::constructor<Matrix<float>()>(), "Matrix");
@@ -66,11 +76,18 @@ namespace ch {
       Vector, float)>(), "Surface");
     chai.add(chaiscript::fun(&lighting::Surface::operator=), "=");
 
+		// Texture
+		chai.add(chaiscript::user_type<Texture>(), "Texture");
+		chai.add(chaiscript::constructor<Texture()>(), "Texture");
+		chai.add(chaiscript::fun(&Texture::load), "load");
 
     // Model
     chai.add(chaiscript::user_type<model::Model>(), "Model");
     chai.add(chaiscript::fun(&model::Model::surface_attribute),
       "surface_attribute");
+		chai.add(chaiscript::fun(&model::Model::texture), "texture");
+		chai.add(chaiscript::fun(&model::Model::uv_coordinates),
+			"uv_coordinates");
 
     chai.add(chaiscript::bootstrap::standard_library::vector_type<
       std::vector<model::Model>>("ModelList"));

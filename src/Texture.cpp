@@ -3,9 +3,15 @@
 #include <cmath>
 #include "SDLUtil.hpp"
 
-Texture::Texture() {
+Texture::Texture()
+:loaded_(false) {
 
 }
+
+// Texture::Texture(const Texture &other)
+// :loaded_(other.loaded_), texture_(other.texture_) {
+//
+// }
 
 bool Texture::load(std::string file_name) {
   // try loading the file
@@ -14,11 +20,16 @@ bool Texture::load(std::string file_name) {
     return false;
 
   // set an optimised version
-  texture_ = std::unique_ptr<SDL_Surface>(SDL_DisplayFormat(raw_image));
+  texture_ = std::shared_ptr<SDL_Surface>(SDL_DisplayFormat(raw_image));
+	loaded_ = true;
   return true;
 }
 
 SDL_Colour Texture::map(Vector2 uv) {
+	// return white if not loaded
+	if (!loaded_)
+		return {255, 255, 255};
+
   // map to texture coordinates
   float x = (uv.x * texture_->w);
   float y = (uv.y * texture_->h);

@@ -32,20 +32,22 @@ public:
 	T& operator()(int x, int y);
 	Matrix<T> operator*(Matrix<T>& other);
 
-	static void transform_vertices(std::vector<Vector> &vectors, Matrix<T> &m);
+	static void transform_vertices(std::vector<Vector> &vectors,
+		Matrix<T> &m);
 	static Matrix<T> identity();
 	static Matrix<T> translate(T x, T y, T z);
 	static Matrix<T> rotate_x(T angle);
 	static Matrix<T> rotate_y(T angle);
 	static Matrix<T> rotate_z(T angle);
-	static Matrix<T> perspective(T fov, T aspect_ratio, 
+	static Matrix<T> perspective(T fov, T aspect_ratio,
 		T near, T far);
 	static Matrix<T> scale(T x, T y, T z);
 	static Matrix<T> lookat(Vector &eye, Vector &target, Vector &up);
-		
+
 	friend bool operator== <> (Matrix<T> &m1, Matrix<T> &m2);
 	friend bool operator!= <> (Matrix<T> &m1, Matrix<T> &m2);
-	friend std::ostream& operator<< <> (std::ostream &strm, Matrix<T> &m);
+	friend std::ostream& operator<< <> (std::ostream &strm,
+		Matrix<T> &m);
 
 private:
 	T values[4][4];
@@ -69,16 +71,16 @@ template<typename T>
 Vector Matrix<T>::mult_vector(Vector vec) {
 	Vector result;
 
-	result.x = ((vec.x * values[0][0]) + (vec.y * values[1][0]) 
+	result.x = ((vec.x * values[0][0]) + (vec.y * values[1][0])
 		+ (vec.z * values[2][0]) + values[3][0]);
-	result.y = ((vec.x * values[0][1]) + (vec.y * values[1][1]) 
+	result.y = ((vec.x * values[0][1]) + (vec.y * values[1][1])
 		+ (vec.z * values[2][1]) + values[3][1]);
-	result.z = ((vec.x * values[0][2]) + (vec.y * values[1][2]) 
+	result.z = ((vec.x * values[0][2]) + (vec.y * values[1][2])
 		+ (vec.z * values[2][2]) + values[3][2]);
-	result.w = ((vec.x * values[0][3]) + (vec.y * values[1][3]) 
+	result.w = ((vec.x * values[0][3]) + (vec.y * values[1][3])
 		+ (vec.z * values[2][3]) + values[3][3]);
 
-	return result;	
+	return result;
 }
 
 template<typename T>
@@ -106,7 +108,7 @@ Matrix<T> Matrix<T>::inverse(bool &valid) {
 				values[3][0] * values[1][3] * values[2][2];
 
 	inv(2, 0) = values[1][0] * values[2][1] * values[3][3] -
-				values[1][0] * values[2][3] * values[3][1] - 
+				values[1][0] * values[2][3] * values[3][1] -
 				values[2][0] * values[1][1] * values[3][3] +
 				values[2][0] * values[1][3] * values[3][1] +
 				values[3][0] * values[1][1] * values[2][3] -
@@ -114,7 +116,7 @@ Matrix<T> Matrix<T>::inverse(bool &valid) {
 
 	inv(3, 0) = -values[1][0] * values[2][1] * values[3][2] +
 				values[1][0] * values[2][2] * values[3][1] +
-				values[2][0] * values[1][1] * values[3][2] - 
+				values[2][0] * values[1][1] * values[3][2] -
 				values[2][0] * values[1][2] * values[3][1] -
 				values[3][0] * values[1][1] * values[2][2] +
 				values[3][0] * values[1][2] * values[2][1];
@@ -127,10 +129,10 @@ Matrix<T> Matrix<T>::inverse(bool &valid) {
 				values[3][1] * values[0][3] * values[2][2];
 
 	inv(1, 1) = values[0][0] * values[2][2] * values[3][3] -
-				values[0][0] * values[2][3] * values[3][2] - 
+				values[0][0] * values[2][3] * values[3][2] -
 				values[2][0] * values[0][2] * values[3][3] +
 				values[2][0] * values[0][3] * values[3][2] +
-				values[3][0] * values[0][2] * values[2][3] - 
+				values[3][0] * values[0][2] * values[2][3] -
 				values[3][0] * values[0][3] * values[2][2];
 
 	inv(2, 1) = -values[0][0] * values[2][1] * values[3][3] +
@@ -140,15 +142,15 @@ Matrix<T> Matrix<T>::inverse(bool &valid) {
 				values[3][0] * values[0][1] * values[2][3] +
 				values[3][0] * values[0][3] * values[2][1];
 
-	inv(3, 1) = values[0][0] * values[2][1] * values[3][2] - 
+	inv(3, 1) = values[0][0] * values[2][1] * values[3][2] -
 				values[0][0] * values[2][2] * values[3][1] -
 				values[2][0] * values[0][1] * values[3][2] +
 				values[2][0] * values[0][2] * values[3][1] +
 				values[3][0] * values[0][1] * values[2][2] -
 				values[3][0] * values[0][2] * values[2][1];
 
-	inv(0, 2) = values[0][1] * values[1][2] * values[3][3] - 
-				values[0][1] * values[1][3] * values[3][2] - 
+	inv(0, 2) = values[0][1] * values[1][2] * values[3][3] -
+				values[0][1] * values[1][3] * values[3][2] -
 				values[1][1] * values[0][2] * values[3][3] +
 				values[1][1] * values[0][3] * values[3][2] +
 				values[3][1] * values[0][2] * values[1][3] -
@@ -183,7 +185,7 @@ Matrix<T> Matrix<T>::inverse(bool &valid) {
 				values[2][1] * values[0][3] * values[1][2];
 
 	inv(1, 3) = values[0][0] * values[1][2] * values[2][3] -
-				values[0][0] * values[1][3] * values[2][2] - 
+				values[0][0] * values[1][3] * values[2][2] -
 				values[1][0] * values[0][2] * values[2][3] +
 				values[1][0] * values[0][3] * values[2][2] +
 				values[2][0] * values[0][2] * values[1][3] -
@@ -283,7 +285,7 @@ Matrix<T> Matrix<T>::translate(T x, T y, T z) {
 template<typename T>
 Matrix<T> Matrix<T>::rotate_x(T angle) {
 	T rad = angle*M_PI/180.0f;
-	
+
 	Matrix<T> m;
 	m(1, 1) = cos(rad);
 	m(1, 2) = -sin(rad);
@@ -317,7 +319,7 @@ Matrix<T> Matrix<T>::rotate_z(T angle) {
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::perspective(T fov, T aspect_ratio, 
+Matrix<T> Matrix<T>::perspective(T fov, T aspect_ratio,
 	T near, T far) {
 	T t = 1.0f/tan(fov*0.5f);
 
