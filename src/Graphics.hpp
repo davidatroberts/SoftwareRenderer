@@ -30,6 +30,11 @@ struct Fragment {
 };
 typedef struct Fragment Fragment;
 
+struct ScreenTriangle {
+	
+};
+typedef struct ScreenTriangle ScreenTriangle;
+
 class Vector;
 class Graphics {
 public:
@@ -50,7 +55,7 @@ public:
 	Fragment to_screen(Vector &v);
 
 private:
-	void flat_triangle(Fragment &p1, Fragment &p2, Fragment &p3, 
+	void flat_triangle(Fragment &p1, Fragment &p2, Fragment &p3,
 		SDL_Colour &colour);
 
 	uint16_t *buffer_;

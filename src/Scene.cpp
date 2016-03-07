@@ -65,7 +65,7 @@ void RenderModelComponent::update(SceneObject &object, float dt) {
   pipeline::transform_vertices(visible_model, mvp);
 
   // calculate the lighting
-  if (lights_.size() > 0) {
+  if ((lights_.size() > 0) && (!visible_model.textured)) {
     // calculate transpose of inverse mvp matrix
     Matrix<float> mvp_inv = mvp.inverse();
     Matrix<float> mvp_inv_tra = mvp_inv.transpose();

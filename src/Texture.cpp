@@ -8,11 +8,6 @@ Texture::Texture()
 
 }
 
-// Texture::Texture(const Texture &other)
-// :loaded_(other.loaded_), texture_(other.texture_) {
-//
-// }
-
 bool Texture::load(std::string file_name) {
   // try loading the file
   SDL_Surface *raw_image = IMG_Load(file_name.c_str());

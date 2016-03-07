@@ -3,24 +3,24 @@
 #include <iostream>
 #include "Debug.hpp"
 
-void pipeline::rasterise(Graphics &graphics, model::Model &model, 
+void pipeline::rasterise(Graphics &graphics, model::Model &model,
 	std::vector<Fragment> frags) {
 	for (unsigned int i=0; i<model.triangles.size(); ++i) {
 			// get the triangles and colours
 			Triangle tri = model.triangles[i];
-			SDL_Colour tri_colour = model.colours[i];
 
 			// get the fragments
 			Fragment f1 = frags[tri[0]];
 			Fragment f2 = frags[tri[1]];
 			Fragment f3 = frags[tri[2]];
 
-			// draw the triangle
+			// draw triangle with solid colour
+			SDL_Colour tri_colour = model.colours[i];
 			graphics.triangle(f1, f2, f3, tri_colour);
 		}
 }
 
-void pipeline::transform_vertices(model::Model &model, 
+void pipeline::transform_vertices(model::Model &model,
 	Matrix<float> &mvp) {
 	for (unsigned int i=0; i<model.vertices.size(); i++) {
 		bool visible = model.visible_vertices[i];
@@ -80,6 +80,12 @@ model::Model pipeline::backface_cull(model::Model &model, Vector camera_pos) {
 	// set the surface attributes
 	visible_model.surface_attribute = model.surface_attribute;
 
+	// set the texture properties
+	visible_model.textured = model.textured;
+	visible_model.uv_coordinates = model.uv_coordinates;
+	visible_model.texture = model.texture;
+
+	// return the visible model
 	return visible_model;
 }
 

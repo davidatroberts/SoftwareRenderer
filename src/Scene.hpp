@@ -40,7 +40,7 @@ namespace scene {
     std::vector<std::shared_ptr<Component>> components_;
   };
 
-  // compoent for rendering 3D models
+  // component for rendering 3D models
   class RenderModelComponent: public Component {
   public:
     RenderModelComponent(model::Model component_model,
@@ -59,6 +59,7 @@ namespace scene {
     std::vector<std::shared_ptr<lighting::Light>>& lights_;
     std::vector<model::Model>& model_list_;
   };
+
 }
 
 #endif

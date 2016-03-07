@@ -12,15 +12,23 @@
 namespace model {
 	// all indices in clockwise order
 	struct Model {
+		// mesh
 		std::vector<Vector> vertices;
+		std::vector<Triangle> triangles;
+
+		// mesh properties
 		std::vector<Vector> triangle_normals;
 		std::vector<Vector> triangle_centers;
-		std::vector<bool> visible_vertices;
-		std::vector<Triangle> triangles;
-		std::vector<SDL_Colour> colours;
-		std::vector<Vector2> uv_coordinates;
 		lighting::Surface surface_attribute;
+
+		// texture properties
+		bool textured = false;
+		std::vector<Vector2> uv_coordinates;
 		Texture texture;
+
+		// intermediate properties
+		std::vector<bool> visible_vertices;
+		std::vector<SDL_Colour> colours;
 	};
 	typedef struct Model Model;
 
