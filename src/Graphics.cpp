@@ -189,6 +189,20 @@ void Graphics::triangle(Fragment &p1, Fragment &p2, Fragment &p3,
 	}
 }
 
+void Graphics::triangle(ScreenTriangle tri) {
+	sort_points(tri.fragments[0], tri.fragments[1], tri.fragments[2]);
+
+	if (tri.fragments[1].y == tri.fragments[2].y) {
+		// bottom flat triangle
+	}
+	else if (tri.fragments[0].y == tri.fragments[1].y) {
+		// top flat triangle
+	}
+	else {
+		// general case
+	}
+}
+
 void Graphics::sort_points(Fragment &p1, Fragment &p2, Fragment &p3) {
 	if (p1.y < p2.y) {
 		if (p1.y < p3.y) {
