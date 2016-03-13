@@ -7,6 +7,9 @@ public:
 
   Vector2 project();
 
+	Vector2 operator*(float scalar);
+	Vector2 operator+(const Vector2& other);
+
   float x;
   float y;
   float q;

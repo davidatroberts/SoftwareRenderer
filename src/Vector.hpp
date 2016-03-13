@@ -1,7 +1,9 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+#include <array>
 #include <ostream>
+#include <tuple>
 #include <vector>
 
 class Vector {
@@ -27,6 +29,7 @@ public:
 
 	static void project_to_3d(std::vector<Vector> &vertices);
 	static void normalize(std::vector<Vector> &vectors);
+	static void sort(Vector &p1, Vector &p2, Vector &p3);
 	static Vector plane_normal(Vector &v1, Vector &v2, Vector &v3);
 	static Vector lerp(Vector v1, Vector v2, float alpha);
 	static Vector up();
@@ -35,6 +38,8 @@ public:
 	static Vector right();
 	static Vector backward();
 	static Vector forward();
+	static std::tuple<float, float, float> compute_barycentric3D(
+		std::array<Vector, 3> vertices, Vector p);
 
 	friend Vector operator-(const Vector &vec);
 	friend bool operator==(Vector &v1, Vector &v2);

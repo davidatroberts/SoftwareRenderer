@@ -4,6 +4,8 @@
 #include <cmath>
 #include <cstdint>
 #include <utility>
+#include "MathUtil.hpp"
+#include "SDLUtil.hpp"
 #include "Vector.hpp"
 
 #define MAX_Z_DEPTH 65535
@@ -190,16 +192,80 @@ void Graphics::triangle(Fragment &p1, Fragment &p2, Fragment &p3,
 }
 
 void Graphics::triangle(ScreenTriangle tri) {
-	sort_points(tri.fragments[0], tri.fragments[1], tri.fragments[2]);
+	Vector::sort(tri.fragments[0], tri.fragments[1], tri.fragments[2]);
 
 	if (tri.fragments[1].y == tri.fragments[2].y) {
 		// bottom flat triangle
+		flat_triangle(tri);
 	}
 	else if (tri.fragments[0].y == tri.fragments[1].y) {
 		// top flat triangle
+		ScreenTriangle tf = {
+			{{tri.fragments[2], tri.fragments[1], tri.fragments[0]}},
+			{{tri.uv_coordinates[2], tri.uv_coordinates[1], tri.uv_coordinates[2]}},
+			{{tri.colours[2], tri.colours[1], tri.colours[0]}},
+			tri.texture,
+			tri.textured
+		};
+
+		flat_triangle(tf);
 	}
 	else {
 		// general case
+		// calculate z
+		float z = tri.fragments[0].z + (tri.fragments[2].z - tri.fragments[0].z)
+			* ((tri.fragments[1].y-tri.fragments[0].y)/
+			(tri.fragments[2].y-tri.fragments[0].y));
+
+		// create p4
+		Vector p4 = {
+			(tri.fragments[0].x + ((tri.fragments[1].y - tri.fragments[0].y)
+			 	/ (tri.fragments[2].y - tri.fragments[0].y))
+			 	* (tri.fragments[2].x - tri.fragments[0].x)),
+			 tri.fragments[1].y,
+			 z
+		};
+
+		// get the barycentric coordinates
+		std::tuple<float, float, float> b_coords = Vector::compute_barycentric3D(
+			{{tri.fragments[0], tri.fragments[1], tri.fragments[2]}}, p4);
+
+		// compute UV coordinates at p4
+		Vector2 p4_uv = (tri.uv_coordinates[0]*std::get<0>(b_coords)) +
+			(tri.uv_coordinates[1]*std::get<1>(b_coords)) +
+			(tri.uv_coordinates[2]*std::get<2>(b_coords));
+
+		// compute colour at p4
+		SDL_Colour c0 = sdl_util::scale_colour(tri.colours[0],
+			std::get<0>(b_coords));
+		SDL_Colour c1 = sdl_util::scale_colour(tri.colours[1],
+			std::get<1>(b_coords));
+		SDL_Colour c2 = sdl_util::scale_colour(tri.colours[2],
+			std::get<2>(b_coords));
+
+		// add colours
+		SDL_Colour p4_colour = sdl_util::add_colour(c0,
+			sdl_util::add_colour(c1, c2));
+
+		// create new screen triangle
+		ScreenTriangle top_flat_tri = {
+			{{tri.fragments[0], tri.fragments[1], p4}},
+			{{tri.uv_coordinates[0], tri.uv_coordinates[1], p4_uv}},
+			{{tri.colours[0], tri.colours[1], p4_colour}},
+			tri.texture,
+			tri.textured
+		};
+		ScreenTriangle bottom_flat_tri = {
+			{{tri.fragments[2], tri.fragments[1], p4}},
+			{{tri.uv_coordinates[2], tri.uv_coordinates[1], p4_uv}},
+			{{tri.colours[2], tri.colours[1], p4_colour}},
+			tri.texture,
+			tri.textured
+		};
+
+		// draw the triangles
+		flat_triangle(top_flat_tri);
+		flat_triangle(bottom_flat_tri);
 	}
 }
 
@@ -348,4 +414,8 @@ void Graphics::flat_triangle(Fragment &p1, Fragment &p2, Fragment &p3,
 			e2 = e2+2*dy2;
 		}
 	}
+}
+
+void Graphics::flat_triangle(ScreenTriangle tri) {
+
 }

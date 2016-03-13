@@ -5,6 +5,7 @@
 #include <tuple>
 #include "SDL/SDL.h"
 #include "Texture.hpp"
+#include "Vector.hpp"
 #include "Vector2.hpp"
 
 struct Triangle {
@@ -30,13 +31,16 @@ struct Fragment {
 	int x;
 	int y;
 	float z;
+	Vector to_vector() {
+		return Vector(x, y, z);
+	}
 };
 typedef struct Fragment Fragment;
 
 struct ScreenTriangle {
-	std::array<Fragment, 3> fragments;
-	std::array<SDL_Colour, 3> colours;
+	std::array<Vector, 3> fragments;
 	std::array<Vector2, 3> uv_coordinates;
+	std::array<SDL_Colour, 3> colours;
 	Texture texture;
 	bool textured;
 };
@@ -65,6 +69,7 @@ public:
 private:
 	void flat_triangle(Fragment &p1, Fragment &p2, Fragment &p3,
 		SDL_Colour &colour);
+	void flat_triangle(ScreenTriangle tri);
 
 	uint16_t *buffer_;
 	float *z_buffer_;

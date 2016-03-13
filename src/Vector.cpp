@@ -67,7 +67,7 @@ Vector Vector::operator/(float scalar) {
 	return Vector(xx, yy, zz, ww);
 }
 
-Vector Vector::operator*(const Vector &other) {
+Vector Vector::operator*(const Vector& other) {
 	return Vector(x*other.x, y*other.y, z*other.z, w*other.w);
 }
 
@@ -123,6 +123,48 @@ void Vector::normalize(std::vector<Vector> &vertices) {
 	}
 }
 
+void Vector::sort(Vector &v1, Vector &v2, Vector &v3) {
+	if (v1.y < v2.y) {
+		if (v1.y < v3.y) {
+			if (v2.y < v3.y) {
+				// v1, v2, v3
+				return;
+			}
+			else {
+				// v1, v3, v2
+				std::swap(v3, v2);
+				return;
+			}
+		}
+		else {
+			// v3, v1, v2
+			std::swap(v2, v3);
+			std::swap(v1, v2);
+			return;
+		}
+	}
+	else {
+		if (v2.y < v3.y) {
+			if (v1.y < v3.y) {
+				// v2, v1, v3
+				std::swap(v1, v2);
+				return;
+			}
+			else {
+				// v2, v3, v1
+				std::swap(v1, v2);
+				std::swap(v2, v3);
+				return;
+			}
+		}
+		else {
+			// v3, v2, v1
+			std::swap(v3, v1);
+			return;
+		}
+	}
+}
+
 Vector Vector::plane_normal(Vector &v1, Vector &v2, Vector &v3) {
 	Vector e3 = v2 - v1;
 	Vector e1 = v3 - v2;
@@ -150,12 +192,39 @@ Vector Vector::right() {
 	return Vector(1, 0, 0);
 }
 
+Vector Vector::backward() {
+	return Vector(0, 0, -1);
+}
+
 Vector Vector::forward() {
 	return Vector(0, 0, 1);
 }
 
-Vector Vector::backward() {
-	return Vector(0, 0, -1);
+std::tuple<float, float, float> Vector::compute_barycentric3D(
+	std::array<Vector, 3> vertices, Vector p) {
+		// perimeter vectors
+		Vector e1 = vertices[2] - vertices[1];
+		Vector e2 = vertices[0] - vertices[2];
+		Vector e3 = vertices[1] - vertices[0];
+
+		// vectors to p
+		Vector d1 = p - vertices[0];
+		Vector d2 = p - vertices[1];
+		Vector d3 = p - vertices[2];
+
+		Vector e1_c_e2 = e1^e2;
+
+		// normal to the plane
+		Vector n = e1_c_e2/e1_c_e2.magnitude();
+
+		float dotn = e1_c_e2.dot(n);
+
+		// barycentric coordinates
+		float b1 = ((e1^d3).dot(n))/dotn;
+		float b2 = ((e2^d1).dot(n))/dotn;
+		float b3 = ((e3^d2).dot(n))/dotn;
+
+		return {b1, b2, b3};
 }
 
 Vector operator-(const Vector &vec) {
