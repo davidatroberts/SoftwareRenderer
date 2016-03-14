@@ -2,6 +2,7 @@
 #define GRAPHICS_H
 
 #include <array>
+#include <memory>
 #include <tuple>
 #include "SDL/SDL.h"
 #include "Texture.hpp"
@@ -31,9 +32,6 @@ struct Fragment {
 	int x;
 	int y;
 	float z;
-	Vector to_vector() {
-		return Vector(x, y, z);
-	}
 };
 typedef struct Fragment Fragment;
 
@@ -41,7 +39,7 @@ struct ScreenTriangle {
 	std::array<Vector, 3> fragments;
 	std::array<Vector2, 3> uv_coordinates;
 	std::array<SDL_Colour, 3> colours;
-	Texture texture;
+	std::shared_ptr<Texture> texture;
 	bool textured;
 };
 typedef struct ScreenTriangle ScreenTriangle;
@@ -60,8 +58,8 @@ public:
 	void clear_zbuffer();
 	void draw_pixel(int x, int y, SDL_Colour &colour);
 	void draw_pixel(int x, int y, float z, SDL_Colour &colour);
-	void line(int x1, int y1, int x2, int y2, SDL_Colour &colour);
 	void line(Fragment &p1, Fragment &p2, SDL_Colour &colour);
+	void line(Vector &v1, Vector &v2, SDL_Colour &colour);
 	void triangle(Fragment &p1, Fragment &p2, Fragment &p3, SDL_Colour &colour);
 	void triangle(ScreenTriangle triangle);
 	Fragment to_screen(Vector &v);

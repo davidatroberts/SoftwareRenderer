@@ -62,47 +62,6 @@ void Graphics::draw_pixel(int x, int y, float z, SDL_Colour &colour) {
 	buffer_[y * width_ + x] = mapped_colour;
 }
 
-// Bresenham's line algorithm
-void Graphics::line(int x1, int y1, int x2, int y2, SDL_Colour &colour) {
-	bool changed = false;
-	int x = x1;
-	int y = y1;
-
-	// estimate length
-	int dx = abs(x2-x1);
-	int dy = abs(y2-y1);
-
-	// direction
-	int signx = sgn(x2-x1);
-	int signy = sgn(y2-y1);
-
-	if (dy > dx) {
-		int tmp = dx;
-        dx = dy;
-        dy = tmp;
-        changed = true;
-	}
-
-	int e = 2 * dy - dx;
-
-	for (int i=1; i<=dx; i++) {
-		draw_pixel(x, y, colour);
-		while(e>=0) {
-			if (changed)
-				x += signx;
-			else
-				y += signy;
-
-			e = e-2*dx;
-		}
-		if (changed)
-			y += signy;
-		else
-			x += signx;
-		e = e+2*dy;
-	}
-	draw_pixel(x2, y2, colour);
-}
 
 // Bresenham's line algorithm with z interpolation
 void Graphics::line(Fragment &f1, Fragment &f2, SDL_Colour &colour) {
@@ -154,6 +113,7 @@ void Graphics::line(Fragment &f1, Fragment &f2, SDL_Colour &colour) {
 	// plot final pixel
 	draw_pixel(f2.x, f2.y, f2.z, colour);
 }
+
 
 // Bresenham's triangle algorithm
 void Graphics::triangle(Fragment &p1, Fragment &p2, Fragment &p3,
@@ -417,5 +377,81 @@ void Graphics::flat_triangle(Fragment &p1, Fragment &p2, Fragment &p3,
 }
 
 void Graphics::flat_triangle(ScreenTriangle tri) {
+	Vector vtemp1 = tri.fragments[0];
+	Vector vtemp2 = tri.fragments[0];
 
+	bool changed1 = false;
+	bool changed2 = false;
+
+	int dx1 = std::abs(tri.fragments[1].x - tri.fragments[0].x);
+	int dy1 = std::abs(tri.fragments[1].y - tri.fragments[0].y);
+
+	int dx2 = std::abs(tri.fragments[2].x - tri.fragments[0].x);
+	int dy2 = std::abs(tri.fragments[2].y - tri.fragments[0].y);
+
+	int sgnx1 = sgn(tri.fragments[1].x - tri.fragments[0].x);
+	int sgnx2 = sgn(tri.fragments[2].x - tri.fragments[0].x);
+
+	int sgny1 = sgn(tri.fragments[1].y - tri.fragments[0].y);
+	int sgny2 = sgn(tri.fragments[2].y - tri.fragments[0].y);
+
+	if (dy1 > dx1) {
+		std::swap(dx1, dy1);
+		changed1 = true;
+	}
+	if (dy2 > dx2) {
+		std::swap(dx2, dy2);
+		changed2 = true;
+	}
+
+	int e1 = 2*dy1-dx1;
+	int e2 = 2*dy2-dx2;
+
+	for (int i=0; i<=dx1; i++) {
+		// calculate za and zb
+		float za = tri.fragments[0].z + (tri.fragments[1].z-tri.fragments[0].z)
+			*((vtemp1.y-tri.fragments[0].y)/(tri.fragments[1].y-tri.fragments[0].y));
+		float zb = tri.fragments[0].z + (tri.fragments[2].z-tri.fragments[0].z)
+			*((vtemp1.y-tri.fragments[0].y)/(tri.fragments[2].y-tri.fragments[0].y));
+
+		// set values
+		vtemp1.z = za;
+		vtemp2.z = zb;
+
+		// render line
+		// line(vtemp1, vtemp2, colour);
+
+		// move down line 1
+		while (e1 >= 0) {
+			if (changed1)
+				vtemp1.x += sgnx1;
+			else
+				vtemp1.y += sgny1;
+			e1 = e1-2*dx1;
+		}
+
+		if (changed1)
+			vtemp1.y += sgny1;
+		else
+			vtemp1.x += sgnx1;
+
+		e1 = e1+2*dy1;
+
+		// move down line 2 to match y position of line 1
+		while (static_cast<int>(vtemp2.y) != static_cast<int>(vtemp1.y)) {
+			while (e2 >= 0) {
+				if (changed2)
+					vtemp2.x += sgnx2;
+				else
+					vtemp2.y += sgny2;
+				e2 = e2-2*dx2;
+			}
+
+			if (changed2)
+				vtemp2.y += sgny2;
+			else
+				vtemp2.x += sgnx2;
+			e2 = e2+2*dy2;
+		}
+	}
 }
